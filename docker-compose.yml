@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: todo_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  migrator:
+    image: migrate/migrate:latest
+    volumes:
+      - ./backend/migrations:/migrations
+    command: ["-path", "/migrations", "-database",  "postgres://user:password@db:5432/todo_db?sslmode=disable", "up"]
+    depends_on:
+      - db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+      - otel-collector
+      - migrator # Add dependency on migrator
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/todo_db?sslmode=disable
+      - JWT_SECRET=your_jwt_secret_key
+      - SERVICE_NAME=todo-backend
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.102.0
+    command: [--config=/etc/otel-collector-config.yaml]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP HTTP receiver
+      - "8888:8888" # Prometheus metrics
+    depends_on:
+      - jaeger
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "14250:14250" # gRPC collector
+      - "14268:14268" # HTTP collector
+      - "6831:6831/udp" # UDP collector
+
+volumes:
+  postgres_data:
