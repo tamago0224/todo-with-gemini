@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"github.com/tamago/todo-with-gemini/backend/internal/auth"
+	
 	"github.com/tamago/todo-with-gemini/backend/internal/db"
 	"github.com/tamago/todo-with-gemini/backend/internal/logging"
 	"github.com/tamago/todo-with-gemini/backend/internal/middleware"
@@ -75,9 +75,12 @@ func main() {
 	taskService := services.NewTaskService(nil)
 	taskController := controllers.NewTaskController(taskService)
 
+	// Initialize AuthController
+	authController := controllers.NewAuthController(dbConn)
+
 	// Public routes
-	router.POST("/signup", auth.Signup(dbConn))
-	router.POST("/login", auth.Login(dbConn))
+	router.POST("/signup", authController.Signup)
+	router.POST("/login", authController.Login)
 
 	// Protected routes
 	protected := router.Group("/api")
