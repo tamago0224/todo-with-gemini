@@ -67,7 +67,7 @@ func TestTaskService_CreateTask(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.NotNil(t, createdTask)
-	assert.Equal(t, userID, createdTask.UserID)
+	assert.Equal(t, int(userID), createdTask.UserID)
 	assert.Equal(t, "New Task", createdTask.Title)
 	mockRepo.AssertExpectations(t)
 }

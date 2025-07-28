@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -11,30 +12,36 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/tamago/todo-with-gemini/backend/internal/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/services"
 )
 
-// MockTaskService is a mock implementation of the TaskService interface
-
+// MockTaskService is a mock that implements the TaskServiceInterface
 type MockTaskService struct {
 	mock.Mock
 }
 
-func (m *MockTaskService) GetTasks(ctx gin.Context, userID uint) ([]models.Task, error) {
+// Statically assert that MockTaskService implements the interface.
+var _ services.TaskServiceInterface = (*MockTaskService)(nil)
+
+func (m *MockTaskService) GetTasks(ctx context.Context, userID uint) ([]models.Task, error) {
 	args := m.Called(ctx, userID)
 	return args.Get(0).([]models.Task), args.Error(1)
 }
 
-func (m *MockTaskService) CreateTask(ctx gin.Context, task *models.Task, userID uint) (*models.Task, error) {
+func (m *MockTaskService) CreateTask(ctx context.Context, task *models.Task, userID uint) (*models.Task, error) {
 	args := m.Called(ctx, task, userID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
 	return args.Get(0).(*models.Task), args.Error(1)
 }
 
-func (m *MockTaskService) UpdateTask(ctx gin.Context, task *models.Task, taskID uint, userID uint) error {
+func (m *MockTaskService) UpdateTask(ctx context.Context, task *models.Task, taskID uint, userID uint) error {
 	args := m.Called(ctx, task, taskID, userID)
 	return args.Error(0)
 }
 
-func (m *MockTaskService) DeleteTask(ctx gin.Context, taskID uint, userID uint) error {
+func (m *MockTaskService) DeleteTask(ctx context.Context, taskID uint, userID uint) error {
 	args := m.Called(ctx, taskID, userID)
 	return args.Error(0)
 }
@@ -46,7 +53,7 @@ func TestTaskController_GetTasks(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-
+	c.Request, _ = http.NewRequest(http.MethodGet, "/tasks", nil)
 	c.Set("userID", uint(1))
 
 	tasks := []models.Task{{ID: 1, UserID: 1, Title: "Test Task"}}
@@ -65,7 +72,6 @@ func TestTaskController_CreateTask(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-
 	c.Set("userID", uint(1))
 
 	task := &models.Task{Title: "New Task"}
@@ -73,7 +79,8 @@ func TestTaskController_CreateTask(t *testing.T) {
 	c.Request, _ = http.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer(jsonValue))
 	c.Request.Header.Set("Content-Type", "application/json")
 
-	mockService.On("CreateTask", mock.Anything, mock.Anything, uint(1)).Return(task, nil)
+	createdTask := &models.Task{ID: 1, UserID: 1, Title: "New Task", Completed: false}
+	mockService.On("CreateTask", mock.Anything, mock.AnythingOfType("*models.Task"), uint(1)).Return(createdTask, nil)
 
 	taskController.CreateTask(c)
 
@@ -88,7 +95,6 @@ func TestTaskController_UpdateTask(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-
 	c.Set("userID", uint(1))
 	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
 
@@ -97,7 +103,7 @@ func TestTaskController_UpdateTask(t *testing.T) {
 	c.Request, _ = http.NewRequest(http.MethodPut, "/tasks/1", bytes.NewBuffer(jsonValue))
 	c.Request.Header.Set("Content-Type", "application/json")
 
-	mockService.On("UpdateTask", mock.Anything, mock.Anything, uint(1), uint(1)).Return(nil)
+	mockService.On("UpdateTask", mock.Anything, mock.AnythingOfType("*models.Task"), uint(1), uint(1)).Return(nil)
 
 	taskController.UpdateTask(c)
 
@@ -112,7 +118,7 @@ func TestTaskController_DeleteTask(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-
+	c.Request, _ = http.NewRequest(http.MethodDelete, "/tasks/1", nil)
 	c.Set("userID", uint(1))
 	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
 

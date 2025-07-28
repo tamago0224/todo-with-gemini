@@ -8,11 +8,18 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
+type TaskServiceInterface interface {
+	GetTasks(ctx context.Context, userID uint) ([]models.Task, error)
+	CreateTask(ctx context.Context, task *models.Task, userID uint) (*models.Task, error)
+	UpdateTask(ctx context.Context, task *models.Task, taskID uint, userID uint) error
+	DeleteTask(ctx context.Context, taskID uint, userID uint) error
+}
+
 type TaskService struct {
 	repo repositories.TaskRepository
 }
 
-func NewTaskService(repo repositories.TaskRepository) *TaskService {
+func NewTaskService(repo repositories.TaskRepository) TaskServiceInterface {
 	return &TaskService{repo: repo}
 }
 
