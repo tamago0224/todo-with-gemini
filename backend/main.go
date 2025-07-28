@@ -17,6 +17,7 @@ import (
 	"github.com/tamago/todo-with-gemini/backend/internal/middleware"
 	"github.com/tamago/todo-with-gemini/backend/internal/controllers"
 	"github.com/tamago/todo-with-gemini/backend/internal/services"
+	"github.com/tamago/todo-with-gemini/backend/internal/repositories"
 	"github.com/tamago/todo-with-gemini/backend/internal/telemetry"
 )
 
@@ -75,8 +76,10 @@ func main() {
 	taskService := services.NewTaskService(nil)
 	taskController := controllers.NewTaskController(taskService)
 
-	// Initialize AuthController
-	authController := controllers.NewAuthController(dbConn)
+	// Initialize Auth layers
+	authRepo := repositories.NewPostgresAuthRepository(dbConn)
+	authService := services.NewAuthService(authRepo)
+	authController := controllers.NewAuthController(authService)
 
 	// Public routes
 	router.POST("/signup", authController.Signup)
