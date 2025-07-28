@@ -1,4 +1,3 @@
-
 package services
 
 import (
@@ -12,7 +11,6 @@ import (
 )
 
 // MockTaskRepository is a mock implementation of the TaskRepository interface
-
 
 type MockTaskRepository struct {
 	mock.Mock
@@ -45,7 +43,7 @@ func TestTaskService_GetTasks(t *testing.T) {
 	ctx := context.Background()
 	userID := uint(1)
 
-	tasks := []models.Task{{ID: 1, UserID: userID, Title: "Test Task"}}
+	tasks := []models.Task{{ID: 1, UserID: int(userID), Title: "Test Task"}}
 	mockRepo.On("GetTasks", ctx, userID).Return(tasks, nil)
 
 	result, err := taskService.GetTasks(ctx, userID)

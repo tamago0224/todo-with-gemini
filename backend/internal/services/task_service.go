@@ -27,7 +27,7 @@ func (s *TaskService) CreateTask(ctx context.Context, task *models.Task, userID 
 	_, span := otel.Tracer("").Start(ctx, "TaskService.CreateTask")
 	defer span.End()
 
-	task.UserID = userID
+	task.UserID = int(userID)
 	task.Completed = false
 
 	if err := s.repo.CreateTask(ctx, task); err != nil {
@@ -41,8 +41,8 @@ func (s *TaskService) UpdateTask(ctx context.Context, task *models.Task, taskID 
 	_, span := otel.Tracer("").Start(ctx, "TaskService.UpdateTask")
 	defer span.End()
 
-	task.ID = taskID
-	task.UserID = userID
+	task.ID = int(taskID)
+	task.UserID = int(userID)
 
 	// You might want to add logic here to check if the user is authorized to update the task
 
