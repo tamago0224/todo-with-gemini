@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -11,8 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/tamago-kake-gohan/todo-with-gemini/backend/internal/models"
-	"github.com/tamago/todo-with-gemini/backend/internal/services"
+	"github.com/tamago/todo-with-gemini/backend/internal/models"
 )
 
 // MockTaskService is a mock implementation of the TaskService interface

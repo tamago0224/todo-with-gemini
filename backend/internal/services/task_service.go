@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"github.com/tamago-kake-gohan/todo-with-gemini/backend/internal/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/models"
 	"github.com/tamago/todo-with-gemini/backend/internal/repositories"
 	"go.opentelemetry.io/otel"
 )
