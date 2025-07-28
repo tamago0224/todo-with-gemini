@@ -4,7 +4,7 @@ package repositories
 import (
 	"context"
 
-	"github.com/tamago-kake-gohan/todo-with-gemini/backend/internal/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/models"
 )
 
 type TaskRepository interface {

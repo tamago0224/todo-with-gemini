@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/tamago-kake-gohan/todo-with-gemini/backend/internal/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/models"
 )
 
 // MockTaskRepository is a mock implementation of the TaskRepository interface

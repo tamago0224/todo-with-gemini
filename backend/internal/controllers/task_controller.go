@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/tamago-kake-gohan/todo-with-gemini/backend/internal/models"
-	"github.com/tamago-kake-gohan/todo-with-gemini/backend/internal/services"
+	"github.com/tamago/todo-with-gemini/backend/internal/services"
 	"go.opentelemetry.io/otel"
 )
 
