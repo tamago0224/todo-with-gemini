@@ -97,5 +97,5 @@ func main() {
 	}
 
 	logging.ContextLogger(context.Background()).Info("Server starting on port 8080")
-	log.Fatal(router.Run(":8080"))
+		slog.Error("Failed to run router", "error", err)
 }
