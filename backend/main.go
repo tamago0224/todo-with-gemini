@@ -15,7 +15,8 @@ import (
 	"github.com/tamago/todo-with-gemini/backend/internal/db"
 	"github.com/tamago/todo-with-gemini/backend/internal/logging"
 	"github.com/tamago/todo-with-gemini/backend/internal/middleware"
-	"github.com/tamago/todo-with-gemini/backend/internal/tasks"
+	"github.com/tamago/todo-with-gemini/backend/internal/controllers"
+	"github.com/tamago/todo-with-gemini/backend/internal/services"
 	"github.com/tamago/todo-with-gemini/backend/internal/telemetry"
 )
 
@@ -69,6 +70,11 @@ func main() {
 	// Apply OpenTelemetry Gin middleware
 	router.Use(telemetry.GinMiddleware())
 
+	// Initialize the layers
+	// In a real application, a concrete implementation of the repository would be passed here.
+	taskService := services.NewTaskService(nil)
+	taskController := controllers.NewTaskController(taskService)
+
 	// Public routes
 	router.POST("/signup", auth.Signup(dbConn))
 	router.POST("/login", auth.Login(dbConn))
@@ -78,10 +84,10 @@ func main() {
 	protected.Use(middleware.AuthMiddleware())
 	{
 		// Task routes
-		protected.GET("/tasks", tasks.GetTasks(dbConn))
-		protected.POST("/tasks", tasks.CreateTask(dbConn))
-		protected.PUT("/tasks/:id", tasks.UpdateTask(dbConn))
-		protected.DELETE("/tasks/:id", tasks.DeleteTask(dbConn))
+		protected.GET("/tasks", taskController.GetTasks)
+		protected.POST("/tasks", taskController.CreateTask)
+		protected.PUT("/tasks/:id", taskController.UpdateTask)
+		protected.DELETE("/tasks/:id", taskController.DeleteTask)
 	}
 
 	logging.ContextLogger(context.Background()).Info("Server starting on port 8080")
