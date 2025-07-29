@@ -4,8 +4,8 @@ info:
   version: 1.0.0
   description: API for managing todo tasks and user authentication.
 servers:
-  - url: http://localhost:8080
-    description: Local Development Server
+  - url: http://localhost:8082
+    description: API Gateway
 
 paths:
   /signup:

@@ -21,10 +21,29 @@ services:
     depends_on:
       - db
 
-  backend:
+  auth-service:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    command: ["go", "run", "./cmd/auth-service"]
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+      - otel-collector
+      - migrator
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/todo_db?sslmode=disable
+      - JWT_SECRET=your_jwt_secret_key
+      - SERVICE_NAME=auth-service
+
+  task-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ["go", "run", "./cmd/task-service"]
     ports:
       - "8080:8080"
     volumes:
@@ -32,11 +51,27 @@ services:
     depends_on:
       - db
       - otel-collector
-      - migrator # Add dependency on migrator
+      - migrator
     environment:
       - DATABASE_URL=postgres://user:password@db:5432/todo_db?sslmode=disable
       - JWT_SECRET=your_jwt_secret_key
-      - SERVICE_NAME=todo-backend
+      - SERVICE_NAME=task-service
+
+  gateway:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ["go", "run", "./cmd/gateway"]
+    ports:
+      - "8082:8080" # Gateway listens on 8080 inside container, exposed as 8082
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - auth-service
+      - task-service
+      - otel-collector
+    environment:
+      - SERVICE_NAME=api-gateway
 
   frontend:
     build:
@@ -49,6 +84,8 @@ services:
       - /app/node_modules
     stdin_open: true
     tty: true
+    depends_on:
+      - gateway # Frontend now depends on gateway
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.102.0
