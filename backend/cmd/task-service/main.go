@@ -12,11 +12,11 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/tamago/todo-with-gemini/backend/internal/app/controllers"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/repositories"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/services"
 	"github.com/tamago/todo-with-gemini/backend/internal/platform/db"
 	"github.com/tamago/todo-with-gemini/backend/internal/platform/logging"
 	"github.com/tamago/todo-with-gemini/backend/internal/platform/middleware"
-	"github.com/tamago/todo-with-gemini/backend/internal/app/repositories"
-	"github.com/tamago/todo-with-gemini/backend/internal/app/services"
 	"github.com/tamago/todo-with-gemini/backend/internal/platform/telemetry"
 )
 
@@ -28,6 +28,9 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		logging.ContextLogger(context.Background()).Info("No .env file found, using environment variables")
 	}
+
+	// Set SERVICE_NAME for OpenTelemetry
+	os.Setenv("SERVICE_NAME", "task-service")
 
 	// Initialize OpenTelemetry
 	shutdownTracer := telemetry.InitTracer()
@@ -75,15 +78,6 @@ func main() {
 	taskService := services.NewTaskService(taskRepo)
 	taskController := controllers.NewTaskController(taskService)
 
-	// Initialize Auth layers
-	authRepo := repositories.NewPostgresAuthRepository(dbConn)
-	authService := services.NewAuthService(authRepo)
-	authController := controllers.NewAuthController(authService)
-
-	// Public routes
-	router.POST("/signup", authController.Signup)
-	router.POST("/login", authController.Login)
-
 	// Protected routes
 	protected := router.Group("/api")
 	protected.Use(middleware.AuthMiddleware())
@@ -95,9 +89,9 @@ func main() {
 		protected.DELETE("/tasks/:id", taskController.DeleteTask)
 	}
 
-	logging.ContextLogger(context.Background()).Info("Server starting on port 8080")
+	logging.ContextLogger(context.Background()).Info("Task Service starting on port 8080")
 	if err := router.Run(":8080"); err != nil {
-		slog.Error("Failed to run router", "error", err)
+		slog.Error("Failed to run task router", "error", err)
 		os.Exit(1)
 	}
 }
