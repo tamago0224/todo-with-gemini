@@ -21,54 +21,22 @@ services:
     depends_on:
       - db
 
-  auth-service:
+  backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.auth-service
-    ports:
-      - "8081:8081"
-    volumes:
-      - ./backend:/app
-    depends_on:
-      - db
-      - otel-collector
-      - migrator
-    environment:
-      - DATABASE_URL=postgres://user:password@db:5432/todo_db?sslmode=disable
-      - JWT_SECRET=your_jwt_secret_key
-      - SERVICE_NAME=auth-service
-
-  task-service:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.task-service
-    ports:
-      - "8082:8082"
-    volumes:
-      - ./backend:/app
-    depends_on:
-      - db
-      - otel-collector
-      - migrator
-    environment:
-      - DATABASE_URL=postgres://user:password@db:5432/todo_db?sslmode=disable
-      - JWT_SECRET=your_jwt_secret_key
-      - SERVICE_NAME=task-service
-
-  gateway:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.gateway
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     volumes:
       - ./backend:/app
     depends_on:
-      - auth-service
-      - task-service
+      - db
       - otel-collector
+      - migrator
     environment:
-      - SERVICE_NAME=api-gateway
+      - DATABASE_URL=postgres://user:password@db:5432/todo_db?sslmode=disable
+      - JWT_SECRET=your_jwt_secret_key
+      - SERVICE_NAME=todo-backend
 
   frontend:
     build:
@@ -82,7 +50,7 @@ services:
     stdin_open: true
     tty: true
     depends_on:
-      - gateway # Frontend now depends on gateway
+      - backend # Frontend now depends on backend
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.102.0

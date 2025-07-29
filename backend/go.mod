@@ -2,10 +2,6 @@ module github.com/tamago/todo-with-gemini/backend
 
 go 1.23.5
 
-replace github.com/tamago/todo-with-gemini/backend/internal/app => ./internal/app
-
-replace github.com/tamago/todo-with-gemini/backend/internal/platform => ./internal/platform
-
 require (
 	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-gonic/gin v1.10.1

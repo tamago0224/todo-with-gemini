@@ -30,7 +30,7 @@ func main() {
 	}
 
 	// Set SERVICE_NAME for OpenTelemetry
-	os.Setenv("SERVICE_NAME", "task-service")
+	os.Setenv("SERVICE_NAME", "todo-backend")
 
 	// Initialize OpenTelemetry
 	shutdownTracer := telemetry.InitTracer()
@@ -78,10 +78,19 @@ func main() {
 	// Apply OpenTelemetry Gin middleware
 	router.Use(telemetry.GinMiddleware())
 
-	// Initialize the layers
+	// Initialize Auth layers
+	authRepo := repositories.NewPostgresAuthRepository(dbConn)
+	authService := services.NewAuthService(authRepo)
+	authController := controllers.NewAuthController(authService)
+
+	// Initialize Task layers
 	taskRepo := repositories.NewPostgresTaskRepository(dbConn)
 	taskService := services.NewTaskService(taskRepo)
 	taskController := controllers.NewTaskController(taskService)
+
+	// Public routes
+	router.POST("/signup", authController.Signup)
+	router.POST("/login", authController.Login)
 
 	// Protected routes
 	protected := router.Group("/api")
@@ -94,9 +103,9 @@ func main() {
 		protected.DELETE("/tasks/:id", taskController.DeleteTask)
 	}
 
-	logging.ContextLogger(context.Background()).Info("Task Service starting on port 8080")
-	if err := router.Run(":8080"); err != nil {
-		slog.Error("Failed to run task router", "error", err)
+	logging.ContextLogger(context.Background()).Info("Backend Service starting on port 8080")
+	if err := router.Run("0.0.0.0:8080"); err != nil {
+		slog.Error("Failed to run backend router", "error", err)
 		os.Exit(1)
 	}
 }
