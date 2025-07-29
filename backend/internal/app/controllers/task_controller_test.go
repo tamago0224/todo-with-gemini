@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
 	"github.com/tamago/todo-with-gemini/backend/internal/app/services"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/repositories"
 )
 
 // MockTaskService is a mock that implements the TaskServiceInterface
@@ -111,6 +112,29 @@ func TestTaskController_UpdateTask(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
+func TestTaskController_UpdateTask_NotFound(t *testing.T) {
+	mockService := new(MockTaskService)
+	taskController := NewTaskController(mockService)
+
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Set("userID", 1)
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+
+	task := &models.Task{Title: "Updated Task"}
+	jsonValue, _ := json.Marshal(task)
+	c.Request, _ = http.NewRequest(http.MethodPut, "/tasks/1", bytes.NewBuffer(jsonValue))
+	c.Request.Header.Set("Content-Type", "application/json")
+
+	mockService.On("UpdateTask", mock.Anything, mock.AnythingOfType("*models.Task"), uint(1), uint(1)).Return(repositories.ErrTaskNotFound)
+
+	taskController.UpdateTask(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	mockService.AssertExpectations(t)
+}
+
 func TestTaskController_DeleteTask(t *testing.T) {
 	mockService := new(MockTaskService)
 	taskController := NewTaskController(mockService)
@@ -122,10 +146,30 @@ func TestTaskController_DeleteTask(t *testing.T) {
 	c.Set("userID", 1)
 	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
 
-			mockService.On("DeleteTask", mock.Anything, uint(1), uint(1)).Return(nil)
+	mockService.On("DeleteTask", mock.Anything, uint(1), uint(1)).Return(nil)
 
 	taskController.DeleteTask(c)
 
 	assert.Equal(t, http.StatusOK, w.Code)
+	mockService.AssertExpectations(t)
+}
+
+func TestTaskController_DeleteTask_NotFound(t *testing.T) {
+	mockService := new(MockTaskService)
+	taskController := NewTaskController(mockService)
+
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Set("userID", 1)
+	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+
+	c.Request, _ = http.NewRequest(http.MethodDelete, "/tasks/1", nil)
+
+	mockService.On("DeleteTask", mock.Anything, uint(1), uint(1)).Return(repositories.ErrTaskNotFound)
+
+	taskController.DeleteTask(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
 	mockService.AssertExpectations(t)
 }

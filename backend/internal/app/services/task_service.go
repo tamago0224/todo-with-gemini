@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
 	"github.com/tamago/todo-with-gemini/backend/internal/app/repositories"
@@ -51,12 +52,17 @@ func (s *TaskService) UpdateTask(ctx context.Context, task *models.Task, taskID 
 	_, span := otel.Tracer("").Start(ctx, "TaskService.UpdateTask")
 	defer span.End()
 
+	utils.RandomSleep()
 	task.ID = int(taskID)
 	task.UserID = int(userID)
 
 	// You might want to add logic here to check if the user is authorized to update the task
 
-	return s.repo.UpdateTask(ctx, task)
+	err := s.repo.UpdateTask(ctx, task)
+	if errors.Is(err, repositories.ErrTaskNotFound) {
+		return err
+	}
+	return nil
 }
 
 func (s *TaskService) DeleteTask(ctx context.Context, taskID uint, userID uint) error {
@@ -66,5 +72,9 @@ func (s *TaskService) DeleteTask(ctx context.Context, taskID uint, userID uint) 
 	// You might want to add logic here to check if the user is authorized to delete the task
 
 	utils.RandomSleep()
-	return s.repo.DeleteTask(ctx, taskID, userID)
+	err := s.repo.DeleteTask(ctx, taskID, userID)
+	if errors.Is(err, repositories.ErrTaskNotFound) {
+		return err
+	}
+	return nil
 }

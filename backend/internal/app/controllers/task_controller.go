@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/repositories"
 	"github.com/tamago/todo-with-gemini/backend/internal/app/services"
 	"github.com/tamago/todo-with-gemini/backend/internal/platform/utils"
 	"go.opentelemetry.io/otel"
@@ -20,10 +22,10 @@ func NewTaskController(service services.TaskServiceInterface) *TaskController {
 }
 
 func (tc *TaskController) GetTasks(c *gin.Context) {
+	utils.RandomSleep()
 	_, span := otel.Tracer("TaskController").Start(c.Request.Context(), "TaskController.GetTasks")
 	defer span.End()
 
-	utils.RandomSleep()
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
@@ -40,10 +42,10 @@ func (tc *TaskController) GetTasks(c *gin.Context) {
 }
 
 func (tc *TaskController) CreateTask(c *gin.Context) {
+	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(c.Request.Context(), "TaskController.CreateTask")
 	defer span.End()
 
-	utils.RandomSleep()
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
@@ -66,10 +68,10 @@ func (tc *TaskController) CreateTask(c *gin.Context) {
 }
 
 func (tc *TaskController) UpdateTask(c *gin.Context) {
+	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(c.Request.Context(), "TaskController.UpdateTask")
 	defer span.End()
 
-	utils.RandomSleep()
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
@@ -89,6 +91,10 @@ func (tc *TaskController) UpdateTask(c *gin.Context) {
 	}
 
 	if err := tc.service.UpdateTask(c.Request.Context(), &task, uint(taskID), uint(userID.(int))); err != nil {
+		if errors.Is(err, repositories.ErrTaskNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update task"})
 		return
 	}
@@ -97,10 +103,10 @@ func (tc *TaskController) UpdateTask(c *gin.Context) {
 }
 
 func (tc *TaskController) DeleteTask(c *gin.Context) {
+	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(c.Request.Context(), "TaskController.DeleteTask")
 	defer span.End()
 
-	utils.RandomSleep()
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
@@ -114,6 +120,10 @@ func (tc *TaskController) DeleteTask(c *gin.Context) {
 	}
 
 	if err := tc.service.DeleteTask(c.Request.Context(), uint(taskID), uint(userID.(int))); err != nil {
+		if errors.Is(err, repositories.ErrTaskNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete task"})
 		return
 	}

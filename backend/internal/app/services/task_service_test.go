@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/repositories"
 )
 
 // MockTaskRepository is a mock implementation of the TaskRepository interface
@@ -89,6 +90,24 @@ func TestTaskService_UpdateTask(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
+func TestTaskService_UpdateTask_NotFound(t *testing.T) {
+	mockRepo := new(MockTaskRepository)
+	taskService := NewTaskService(mockRepo)
+
+	ctx := context.Background()
+	userID := uint(1)
+	taskID := uint(1)
+	task := &models.Task{Title: "Updated Task"}
+
+	mockRepo.On("UpdateTask", ctx, mock.Anything).Return(repositories.ErrTaskNotFound)
+
+	err := taskService.UpdateTask(ctx, task, taskID, userID)
+
+	assert.Error(t, err)
+	assert.True(t, errors.Is(err, repositories.ErrTaskNotFound))
+	mockRepo.AssertExpectations(t)
+}
+
 func TestTaskService_DeleteTask(t *testing.T) {
 	mockRepo := new(MockTaskRepository)
 	taskService := NewTaskService(mockRepo)
@@ -102,6 +121,23 @@ func TestTaskService_DeleteTask(t *testing.T) {
 	err := taskService.DeleteTask(ctx, taskID, userID)
 
 	assert.NoError(t, err)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestTaskService_DeleteTask_NotFound(t *testing.T) {
+	mockRepo := new(MockTaskRepository)
+	taskService := NewTaskService(mockRepo)
+
+	ctx := context.Background()
+	userID := uint(1)
+	taskID := uint(1)
+
+	mockRepo.On("DeleteTask", ctx, taskID, userID).Return(repositories.ErrTaskNotFound)
+
+	err := taskService.DeleteTask(ctx, taskID, userID)
+
+	assert.Error(t, err)
+	assert.True(t, errors.Is(err, repositories.ErrTaskNotFound))
 	mockRepo.AssertExpectations(t)
 }
 

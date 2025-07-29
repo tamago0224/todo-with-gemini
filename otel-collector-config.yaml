@@ -13,7 +13,6 @@ exporters:
       insecure: true
 
 service:
-  name: todo-app
   pipelines:
     traces:
       receivers: [otlp]

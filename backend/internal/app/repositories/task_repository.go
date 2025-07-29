@@ -3,11 +3,14 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
 	"github.com/tamago/todo-with-gemini/backend/internal/platform/utils"
 	"go.opentelemetry.io/otel"
 )
+
+var ErrTaskNotFound = errors.New("task not found")
 
 type TaskRepository interface {
 	GetTasks(ctx context.Context, userID uint) ([]models.Task, error)
@@ -50,7 +53,7 @@ func (r *PostgresTaskRepository) CreateTask(ctx context.Context, task *models.Ta
 	_, span := otel.Tracer("").Start(ctx, "TaskRepository.CreateTask")
 	defer span.End()
 
-	query := "INSERT INTO tasks (user_id, title, completed) VALUES ($1, $2, $3) RETURNING id"
+	query := "INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id"
 	var id int
 	err := r.db.QueryRowContext(ctx, query, task.UserID, task.Title, task.Completed).Scan(&id)
 	if err != nil {
@@ -66,8 +69,18 @@ func (r *PostgresTaskRepository) UpdateTask(ctx context.Context, task *models.Ta
 	defer span.End()
 
 	query := "UPDATE tasks SET title = $1, completed = $2 WHERE id = $3 AND user_id = $4"
-	_, err := r.db.ExecContext(ctx, query, task.Title, task.Completed, task.ID, task.UserID)
-	return err
+	result, err := r.db.ExecContext(ctx, query, task.Title, task.Completed, task.ID, task.UserID)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return ErrTaskNotFound
+	}
+	return nil
 }
 
 func (r *PostgresTaskRepository) DeleteTask(ctx context.Context, taskID uint, userID uint) error {
@@ -76,6 +89,16 @@ func (r *PostgresTaskRepository) DeleteTask(ctx context.Context, taskID uint, us
 
 	utils.RandomSleep()
 	query := "DELETE FROM tasks WHERE id = $1 AND user_id = $2"
-	_, err := r.db.ExecContext(ctx, query, taskID, userID)
-	return err
+	result, err := r.db.ExecContext(ctx, query, taskID, userID)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return ErrTaskNotFound
+	}
+	return nil
 }
