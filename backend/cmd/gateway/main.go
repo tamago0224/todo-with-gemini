@@ -63,6 +63,11 @@ func main() {
 	// Create reverse proxies
 	authProxy := httputil.NewSingleHostReverseProxy(authServiceURL)
 	taskProxy := httputil.NewSingleHostReverseProxy(taskServiceURL)
+	taskProxy.Director = func(req *http.Request) {
+		req.URL.Scheme = taskServiceURL.Scheme
+		req.URL.Host = taskServiceURL.Host
+		req.URL.Path = "/api/tasks" + req.URL.Path[len("/api/tasks"):]
+	}
 
 	// Auth Service routes
 	router.POST("/signup", func(c *gin.Context) { authProxy.ServeHTTP(c.Writer, c.Request) })
