@@ -52,8 +52,8 @@ func main() {
 	router.Use(telemetry.GinMiddleware())
 
 	// Define target URLs for services
-	authServiceURL, _ := url.Parse("http://localhost:8081") // Auth Service
-	taskServiceURL, _ := url.Parse("http://localhost:8080") // Task Service
+	authServiceURL, _ := url.Parse("http://auth-service:8081") // Auth Service
+	taskServiceURL, _ := url.Parse("http://task-service:8080") // Task Service
 
 	// Create reverse proxies
 	authProxy := httputil.NewSingleHostReverseProxy(authServiceURL)
