@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		slog.Info("Authenticated user", "userID", userID)
 		c.Set("userID", userID)
 		c.Next()
 	}

@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/tamago/todo-with-gemini/backend/internal/models"
 	"github.com/tamago/todo-with-gemini/backend/internal/repositories"
@@ -24,6 +25,7 @@ func NewTaskService(repo repositories.TaskRepository) TaskServiceInterface {
 }
 
 func (s *TaskService) GetTasks(ctx context.Context, userID uint) ([]models.Task, error) {
+	slog.Info("Fetching tasks for user", "userID", userID)
 	_, span := otel.Tracer("").Start(ctx, "TaskService.GetTasks")
 	defer span.End()
 

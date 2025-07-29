@@ -28,7 +28,7 @@ func (tc *TaskController) GetTasks(c *gin.Context) {
 		return
 	}
 
-	tasks, err := tc.service.GetTasks(c.Request.Context(), userID.(uint))
+	tasks, err := tc.service.GetTasks(c.Request.Context(), uint(userID.(int)))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve tasks"})
 		return

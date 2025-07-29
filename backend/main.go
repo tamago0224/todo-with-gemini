@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
-	"log"
+	"log/slog"
 	"os"
 	"time"
 
@@ -11,13 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	
+	"github.com/tamago/todo-with-gemini/backend/internal/controllers"
 	"github.com/tamago/todo-with-gemini/backend/internal/db"
 	"github.com/tamago/todo-with-gemini/backend/internal/logging"
 	"github.com/tamago/todo-with-gemini/backend/internal/middleware"
-	"github.com/tamago/todo-with-gemini/backend/internal/controllers"
-	"github.com/tamago/todo-with-gemini/backend/internal/services"
 	"github.com/tamago/todo-with-gemini/backend/internal/repositories"
+	"github.com/tamago/todo-with-gemini/backend/internal/services"
 	"github.com/tamago/todo-with-gemini/backend/internal/telemetry"
 )
 
@@ -72,8 +71,8 @@ func main() {
 	router.Use(telemetry.GinMiddleware())
 
 	// Initialize the layers
-	// In a real application, a concrete implementation of the repository would be passed here.
-	taskService := services.NewTaskService(nil)
+	taskRepo := repositories.NewPostgresTaskRepository(dbConn)
+	taskService := services.NewTaskService(taskRepo)
 	taskController := controllers.NewTaskController(taskService)
 
 	// Initialize Auth layers
@@ -97,5 +96,8 @@ func main() {
 	}
 
 	logging.ContextLogger(context.Background()).Info("Server starting on port 8080")
+	if err := router.Run(":8080"); err != nil {
 		slog.Error("Failed to run router", "error", err)
+		os.Exit(1)
+	}
 }
