@@ -46,6 +46,7 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 }
 
 func (s *AuthService) Signup(ctx context.Context, username, password string) error {
+	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(ctx, "AuthService.Signup")
 	defer span.End()
 

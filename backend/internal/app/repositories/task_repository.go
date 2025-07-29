@@ -70,6 +70,7 @@ func (r *PostgresTaskRepository) UpdateTask(ctx context.Context, task *models.Ta
 }
 
 func (r *PostgresTaskRepository) DeleteTask(ctx context.Context, taskID uint, userID uint) error {
+	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(ctx, "TaskRepository.DeleteTask")
 	defer span.End()
 

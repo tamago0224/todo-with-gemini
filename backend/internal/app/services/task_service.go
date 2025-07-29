@@ -59,6 +59,7 @@ func (s *TaskService) UpdateTask(ctx context.Context, task *models.Task, taskID 
 }
 
 func (s *TaskService) DeleteTask(ctx context.Context, taskID uint, userID uint) error {
+	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(ctx, "TaskService.DeleteTask")
 	defer span.End()
 

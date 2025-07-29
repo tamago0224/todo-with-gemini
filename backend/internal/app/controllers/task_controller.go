@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
 	"github.com/tamago/todo-with-gemini/backend/internal/app/services"
+	"github.com/tamago/todo-with-gemini/backend/internal/platform/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -19,7 +20,8 @@ func NewTaskController(service services.TaskServiceInterface) *TaskController {
 }
 
 func (tc *TaskController) GetTasks(c *gin.Context) {
-	_, span := otel.Tracer("").Start(c.Request.Context(), "TaskController.GetTasks")
+	utils.RandomSleep()
+	_, span := otel.Tracer("TaskController").Start(c.Request.Context(), "TaskController.GetTasks")
 	defer span.End()
 
 	userID, exists := c.Get("userID")
@@ -38,6 +40,7 @@ func (tc *TaskController) GetTasks(c *gin.Context) {
 }
 
 func (tc *TaskController) CreateTask(c *gin.Context) {
+	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(c.Request.Context(), "TaskController.CreateTask")
 	defer span.End()
 
@@ -63,6 +66,7 @@ func (tc *TaskController) CreateTask(c *gin.Context) {
 }
 
 func (tc *TaskController) UpdateTask(c *gin.Context) {
+	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(c.Request.Context(), "TaskController.UpdateTask")
 	defer span.End()
 
@@ -93,6 +97,7 @@ func (tc *TaskController) UpdateTask(c *gin.Context) {
 }
 
 func (tc *TaskController) DeleteTask(c *gin.Context) {
+	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(c.Request.Context(), "TaskController.DeleteTask")
 	defer span.End()
 

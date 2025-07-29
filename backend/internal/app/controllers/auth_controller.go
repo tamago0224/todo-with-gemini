@@ -40,6 +40,7 @@ func (ac *AuthController) Login(c *gin.Context) {
 
 // Signup handles user registration.
 func (ac *AuthController) Signup(c *gin.Context) {
+	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(c.Request.Context(), "AuthController.Signup")
 	defer span.End()
 

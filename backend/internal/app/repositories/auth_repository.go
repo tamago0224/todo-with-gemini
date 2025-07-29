@@ -38,6 +38,7 @@ func (r *PostgresAuthRepository) GetUserByUsername(ctx context.Context, username
 }
 
 func (r *PostgresAuthRepository) CreateUser(ctx context.Context, user *models.User) error {
+	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(ctx, "AuthRepository.CreateUser")
 	defer span.End()
 
