@@ -4,8 +4,8 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/tamago/todo-with-gemini/backend/internal/models"
-	"github.com/tamago/todo-with-gemini/backend/internal/repositories"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/repositories"
 	"go.opentelemetry.io/otel"
 )
 

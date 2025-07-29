@@ -11,8 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/tamago/todo-with-gemini/backend/internal/models"
-	"github.com/tamago/todo-with-gemini/backend/internal/services"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/services"
 )
 
 // MockTaskService is a mock that implements the TaskServiceInterface
@@ -54,7 +54,7 @@ func TestTaskController_GetTasks(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request, _ = http.NewRequest(http.MethodGet, "/tasks", nil)
-	c.Set("userID", uint(1))
+	c.Set("userID", 1)
 
 	tasks := []models.Task{{ID: 1, UserID: 1, Title: "Test Task"}}
 	mockService.On("GetTasks", mock.Anything, uint(1)).Return(tasks, nil)
@@ -72,7 +72,7 @@ func TestTaskController_CreateTask(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	c.Set("userID", uint(1))
+	c.Set("userID", 1)
 
 	task := &models.Task{Title: "New Task"}
 	jsonValue, _ := json.Marshal(task)
@@ -95,7 +95,7 @@ func TestTaskController_UpdateTask(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	c.Set("userID", uint(1))
+	c.Set("userID", 1)
 	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
 
 	task := &models.Task{Title: "Updated Task"}
@@ -119,10 +119,10 @@ func TestTaskController_DeleteTask(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request, _ = http.NewRequest(http.MethodDelete, "/tasks/1", nil)
-	c.Set("userID", uint(1))
+	c.Set("userID", 1)
 	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
 
-	mockService.On("DeleteTask", mock.Anything, uint(1), uint(1)).Return(nil)
+			mockService.On("DeleteTask", mock.Anything, uint(1), uint(1)).Return(nil)
 
 	taskController.DeleteTask(c)
 

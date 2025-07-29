@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/tamago/todo-with-gemini/backend/internal/models"
-	"github.com/tamago/todo-with-gemini/backend/internal/services"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/services"
 )
 
 // MockAuthService is a mock implementation of the AuthServiceInterface

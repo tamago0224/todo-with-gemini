@@ -11,13 +11,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"github.com/tamago/todo-with-gemini/backend/internal/controllers"
-	"github.com/tamago/todo-with-gemini/backend/internal/db"
-	"github.com/tamago/todo-with-gemini/backend/internal/logging"
-	"github.com/tamago/todo-with-gemini/backend/internal/middleware"
-	"github.com/tamago/todo-with-gemini/backend/internal/repositories"
-	"github.com/tamago/todo-with-gemini/backend/internal/services"
-	"github.com/tamago/todo-with-gemini/backend/internal/telemetry"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/controllers"
+	"github.com/tamago/todo-with-gemini/backend/internal/platform/db"
+	"github.com/tamago/todo-with-gemini/backend/internal/platform/logging"
+	"github.com/tamago/todo-with-gemini/backend/internal/platform/middleware"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/repositories"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/services"
+	"github.com/tamago/todo-with-gemini/backend/internal/platform/telemetry"
 )
 
 func main() {

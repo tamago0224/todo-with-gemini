@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/tamago/todo-with-gemini/backend/internal/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
 	"go.opentelemetry.io/otel"
 )
 

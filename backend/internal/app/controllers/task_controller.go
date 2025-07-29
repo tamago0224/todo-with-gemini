@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tamago/todo-with-gemini/backend/internal/models"
-	"github.com/tamago/todo-with-gemini/backend/internal/services"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/services"
 	"go.opentelemetry.io/otel"
 )
 
@@ -53,7 +53,7 @@ func (tc *TaskController) CreateTask(c *gin.Context) {
 		return
 	}
 
-	createdTask, err := tc.service.CreateTask(c.Request.Context(), &task, userID.(uint))
+	createdTask, err := tc.service.CreateTask(c.Request.Context(), &task, uint(userID.(int)))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create task"})
 		return
@@ -84,7 +84,7 @@ func (tc *TaskController) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	if err := tc.service.UpdateTask(c.Request.Context(), &task, uint(taskID), userID.(uint)); err != nil {
+	if err := tc.service.UpdateTask(c.Request.Context(), &task, uint(taskID), uint(userID.(int))); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update task"})
 		return
 	}
@@ -108,7 +108,7 @@ func (tc *TaskController) DeleteTask(c *gin.Context) {
 		return
 	}
 
-	if err := tc.service.DeleteTask(c.Request.Context(), uint(taskID), userID.(uint)); err != nil {
+	if err := tc.service.DeleteTask(c.Request.Context(), uint(taskID), uint(userID.(int))); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete task"})
 		return
 	}

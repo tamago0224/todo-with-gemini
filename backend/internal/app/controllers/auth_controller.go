@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 
-	"github.com/tamago/todo-with-gemini/backend/internal/models"
-	"github.com/tamago/todo-with-gemini/backend/internal/services"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/services"
 )
 
 type AuthController struct {

@@ -9,7 +9,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/tamago/todo-with-gemini/backend/internal/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
+	
 	
 )
 

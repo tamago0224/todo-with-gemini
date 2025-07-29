@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/tamago/todo-with-gemini/backend/internal/models"
-	"github.com/tamago/todo-with-gemini/backend/internal/repositories"
-	"github.com/tamago/todo-with-gemini/backend/internal/utils"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/app/repositories"
+	"github.com/tamago/todo-with-gemini/backend/internal/platform/utils"
 	"go.opentelemetry.io/otel"
 	"golang.org/x/crypto/bcrypt"
 )

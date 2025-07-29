@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/tamago/todo-with-gemini/backend/internal/utils"
+	"github.com/tamago/todo-with-gemini/backend/internal/platform/utils"
 )
 
 // AuthMiddleware validates the JWT token from the request header.

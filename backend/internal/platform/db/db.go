@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"log"
+	"log/slog"
 
 	_ "github.com/lib/pq"
 )
@@ -19,6 +19,6 @@ func InitDB(dataSourceName string) (*sql.DB, error) {
 		return nil, fmt.Errorf("error connecting to the database: %w", err)
 	}
 
-	log.Println("Successfully connected to the database!")
+		slog.Info("Successfully connected to the database!")
 	return db, nil
 }

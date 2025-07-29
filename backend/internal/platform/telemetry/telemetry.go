@@ -2,8 +2,8 @@ package telemetry
 
 import (
 	"context"
-	"log"
 	"os"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
 	otelgin "go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
@@ -23,12 +23,14 @@ func InitTracer() func(context.Context) error {
 		grpc.WithBlock(),
 	)
 	if err != nil {
-		log.Fatalf("failed to create gRPC connection to collector: %v", err)
+		slog.Error("failed to create gRPC connection to collector", "error", err)
+		os.Exit(1)
 	}
 
 	exporter, err := otlptracegrpc.New(context.Background(), otlptracegrpc.WithGRPCConn(conn))
 	if err != nil {
-		log.Fatalf("failed to create trace exporter: %v", err)
+		slog.Error("failed to create trace exporter", "error", err)
+		os.Exit(1)
 	}
 
 	// Create a new tracer provider with the batch span processor.
@@ -42,7 +44,7 @@ func InitTracer() func(context.Context) error {
 
 	// Set the global error handler
 	otel.SetErrorHandler(otel.ErrorHandlerFunc(func(err error) {
-		log.Printf("OpenTelemetry error: %v", err)
+		slog.Error("OpenTelemetry error", "error", err)
 	}))
 
 	return tracerProvider.Shutdown
