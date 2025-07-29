@@ -30,7 +30,7 @@ func main() {
 	}
 
 	// Set SERVICE_NAME for OpenTelemetry
-	os.Setenv("SERVICE_NAME", "todo-backend")
+	os.Setenv("SERVICE_NAME", "todo-app")
 
 	// Initialize OpenTelemetry
 	shutdownTracer := telemetry.InitTracer()
