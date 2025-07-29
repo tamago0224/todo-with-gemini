@@ -57,7 +57,12 @@ func main() {
 		}
 	}(dbConn)
 
-	router := gin.Default()
+	router := gin.New()
+	router.RedirectTrailingSlash = false
+	router.RedirectFixedPath = false
+
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
 
 	// Apply CORS middleware
 	router.Use(cors.New(cors.Config{
@@ -82,7 +87,7 @@ func main() {
 	router.POST("/login", authController.Login)
 
 	logging.ContextLogger(context.Background()).Info("Auth Service starting on port 8081")
-	if err := router.Run(":8081"); err != nil {
+	if err := router.Run("0.0.0.0:8081"); err != nil {
 		slog.Error("Failed to run auth router", "error", err)
 		os.Exit(1)
 	}

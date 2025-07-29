@@ -36,7 +36,12 @@ func main() {
 		}
 	}()
 
-	router := gin.Default()
+	router := gin.New()
+	router.RedirectTrailingSlash = false
+	router.RedirectFixedPath = false
+
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
 
 	// Apply CORS middleware
 	router.Use(cors.New(cors.Config{
@@ -67,7 +72,7 @@ func main() {
 	router.Any("/api/tasks/*any", func(c *gin.Context) { taskProxy.ServeHTTP(c.Writer, c.Request) })
 
 	logging.ContextLogger(context.Background()).Info("API Gateway starting on port 8080")
-	if err := router.Run(":8080"); err != nil {
+	if err := router.Run("0.0.0.0:8080"); err != nil {
 		slog.Error("Failed to run API Gateway", "error", err)
 		os.Exit(1)
 	}

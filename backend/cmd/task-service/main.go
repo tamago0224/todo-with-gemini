@@ -58,7 +58,12 @@ func main() {
 		}
 	}(dbConn)
 
-	router := gin.Default()
+	router := gin.New()
+	router.RedirectTrailingSlash = false
+	router.RedirectFixedPath = false
+
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
 
 	// Apply CORS middleware
 	router.Use(cors.New(cors.Config{
