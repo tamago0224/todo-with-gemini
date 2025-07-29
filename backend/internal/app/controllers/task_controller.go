@@ -20,10 +20,10 @@ func NewTaskController(service services.TaskServiceInterface) *TaskController {
 }
 
 func (tc *TaskController) GetTasks(c *gin.Context) {
-	utils.RandomSleep()
 	_, span := otel.Tracer("TaskController").Start(c.Request.Context(), "TaskController.GetTasks")
 	defer span.End()
 
+	utils.RandomSleep()
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
@@ -40,10 +40,10 @@ func (tc *TaskController) GetTasks(c *gin.Context) {
 }
 
 func (tc *TaskController) CreateTask(c *gin.Context) {
-	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(c.Request.Context(), "TaskController.CreateTask")
 	defer span.End()
 
+	utils.RandomSleep()
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
@@ -66,10 +66,10 @@ func (tc *TaskController) CreateTask(c *gin.Context) {
 }
 
 func (tc *TaskController) UpdateTask(c *gin.Context) {
-	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(c.Request.Context(), "TaskController.UpdateTask")
 	defer span.End()
 
+	utils.RandomSleep()
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
@@ -97,10 +97,10 @@ func (tc *TaskController) UpdateTask(c *gin.Context) {
 }
 
 func (tc *TaskController) DeleteTask(c *gin.Context) {
-	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(c.Request.Context(), "TaskController.DeleteTask")
 	defer span.End()
 
+	utils.RandomSleep()
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})

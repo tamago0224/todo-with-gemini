@@ -8,6 +8,7 @@ import (
 
 	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
 	"github.com/tamago/todo-with-gemini/backend/internal/app/services"
+	"github.com/tamago/todo-with-gemini/backend/internal/platform/utils"
 )
 
 type AuthController struct {
@@ -23,6 +24,7 @@ func (ac *AuthController) Login(c *gin.Context) {
 	_, span := otel.Tracer("").Start(c.Request.Context(), "AuthController.Login")
 	defer span.End()
 
+	utils.RandomSleep()
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -40,10 +42,10 @@ func (ac *AuthController) Login(c *gin.Context) {
 
 // Signup handles user registration.
 func (ac *AuthController) Signup(c *gin.Context) {
-	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(c.Request.Context(), "AuthController.Signup")
 	defer span.End()
 
+	utils.RandomSleep()
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

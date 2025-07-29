@@ -28,6 +28,7 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 	_, span := otel.Tracer("").Start(ctx, "AuthService.Login")
 	defer span.End()
 
+	utils.RandomSleep()
 	user, err := s.repo.GetUserByUsername(ctx, username)
 	if err != nil {
 		return "", errors.New("Invalid credentials")
@@ -46,10 +47,10 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 }
 
 func (s *AuthService) Signup(ctx context.Context, username, password string) error {
-	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(ctx, "AuthService.Signup")
 	defer span.End()
 
+	utils.RandomSleep()
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return errors.New("Failed to hash password")

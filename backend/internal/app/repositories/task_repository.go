@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/platform/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -70,10 +71,10 @@ func (r *PostgresTaskRepository) UpdateTask(ctx context.Context, task *models.Ta
 }
 
 func (r *PostgresTaskRepository) DeleteTask(ctx context.Context, taskID uint, userID uint) error {
-	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(ctx, "TaskRepository.DeleteTask")
 	defer span.End()
 
+	utils.RandomSleep()
 	query := "DELETE FROM tasks WHERE id = $1 AND user_id = $2"
 	_, err := r.db.ExecContext(ctx, query, taskID, userID)
 	return err

@@ -2,10 +2,10 @@ package services
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
 	"github.com/tamago/todo-with-gemini/backend/internal/app/repositories"
+	"github.com/tamago/todo-with-gemini/backend/internal/platform/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -25,10 +25,10 @@ func NewTaskService(repo repositories.TaskRepository) TaskServiceInterface {
 }
 
 func (s *TaskService) GetTasks(ctx context.Context, userID uint) ([]models.Task, error) {
-	slog.Info("Fetching tasks for user", "userID", userID)
 	_, span := otel.Tracer("").Start(ctx, "TaskService.GetTasks")
 	defer span.End()
 
+	utils.RandomSleep()
 	return s.repo.GetTasks(ctx, userID)
 }
 
@@ -36,6 +36,7 @@ func (s *TaskService) CreateTask(ctx context.Context, task *models.Task, userID 
 	_, span := otel.Tracer("").Start(ctx, "TaskService.CreateTask")
 	defer span.End()
 
+	utils.RandomSleep()
 	task.UserID = int(userID)
 	task.Completed = false
 
@@ -59,11 +60,11 @@ func (s *TaskService) UpdateTask(ctx context.Context, task *models.Task, taskID 
 }
 
 func (s *TaskService) DeleteTask(ctx context.Context, taskID uint, userID uint) error {
-	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(ctx, "TaskService.DeleteTask")
 	defer span.End()
 
 	// You might want to add logic here to check if the user is authorized to delete the task
 
+	utils.RandomSleep()
 	return s.repo.DeleteTask(ctx, taskID, userID)
 }

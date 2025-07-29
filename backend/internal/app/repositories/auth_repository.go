@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/tamago/todo-with-gemini/backend/internal/app/models"
+	"github.com/tamago/todo-with-gemini/backend/internal/platform/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -25,6 +26,7 @@ func (r *PostgresAuthRepository) GetUserByUsername(ctx context.Context, username
 	_, span := otel.Tracer("").Start(ctx, "AuthRepository.GetUserByUsername")
 	defer span.End()
 
+	utils.RandomSleep()
 	var user models.User
 	var storedPasswordHash string
 	query := "SELECT id, username, password_hash FROM users WHERE username = $1"
@@ -38,10 +40,10 @@ func (r *PostgresAuthRepository) GetUserByUsername(ctx context.Context, username
 }
 
 func (r *PostgresAuthRepository) CreateUser(ctx context.Context, user *models.User) error {
-	utils.RandomSleep()
 	_, span := otel.Tracer("").Start(ctx, "AuthRepository.CreateUser")
 	defer span.End()
 
+	utils.RandomSleep()
 	query := "INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id"
 	var id int
 	err := r.db.QueryRowContext(ctx, query, user.Username, user.Password).Scan(&id)
