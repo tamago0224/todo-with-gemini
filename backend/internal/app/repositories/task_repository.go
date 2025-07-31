@@ -53,7 +53,7 @@ func (r *PostgresTaskRepository) CreateTask(ctx context.Context, task *models.Ta
 	_, span := otel.Tracer("").Start(ctx, "TaskRepository.CreateTask")
 	defer span.End()
 
-	query := "INSERT INTO tasks (username, password_hash, completed) VALUES ($1, $2, $3) RETURNING id"
+	query := "INSERT INTO tasks (title, user_id, completed) VALUES ($1, $2, $3) RETURNING id"
 	var id int
 	err := r.db.QueryRowContext(ctx, query, task.UserID, task.Title, task.Completed).Scan(&id)
 	if err != nil {
